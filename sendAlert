@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Nov  3 16:10:53 2018
+
+@author: TangSan
+"""
+import requests
+import time
+import serial
+def sendMail():
+    return requests.post(
+        "DOMAIN HERE",
+        auth=("api", "API KEY HERE"),
+        data={"from": "Your caring friends Zeng and Sarhad <support@sarhad.me>",
+              "to": ["YOUR EMAIL HERE"],
+              "subject": "Hello",
+              "text": "YOU FORGOT SOMETHING AT HOME"}) 
+    
+def checkTime(desiredHour, desiredMinute):
+    currentTime = time.localtime()
+    if (currentTime.tm_hour == desiredHour):
+        if (abs(currentTime.tm_minute - 3) < 2):
+            # invoke if 3 minutes of desired time
+            return True
+    return False
+
+def didIForgetSomething():
+    ser = serial.Serial()  # open serial port
+    ser.port = "COM9"
+    ser.open()
+    for i in range(10):
+        line = ser.readline()
+        line = line.decode('ascii')
+        line = line[:-2]
+        print(line)
+        if "Not empty" == line:
+            # This check should go first in the main while loop
+            print("Sending mail")
+            sendMail()
+            break
+    ser.close()
+
+
+# Should be in main
+#while (True):
+#    if (checkTime(10, 1)):
+#        didIForgetSomething()
+#        break;
